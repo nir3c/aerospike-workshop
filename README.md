@@ -7,9 +7,9 @@ prerequisites for this workshop:
     3. aerospike feature key file(so you can run Aerospike Enterprise Edition).
 
 To make sure all is set for the workshop please put your feature key file (features.conf) under
-<your-clone-project-path>/docker/all-services/aerospike/features/
-<your-clone-project-path>/docker/aerospike-receiver/aerospike/features/ 
-<your-clone-project-path>/docker/kafka-only/aerospike/features/ 
+{your-clone-project-path}/docker/all-services/aerospike/features/
+{your-clone-project-path}/docker/aerospike-receiver/aerospike/features/ 
+{your-clone-project-path}/docker/kafka-only/aerospike/features/ 
  
  for windows please replace $PWD with the full cloned project folder path
  
