@@ -1,0 +1,30 @@
+service:
+  port: <CONNECTOR_RUNNING_PORT>
+
+producer-props:
+  bootstrap.servers:
+    - <KAFKA_BROKER:KAFKA_PORT>
+
+logging:
+  file: /var/log/aerospike-kafka-outbound/aerospike-kafka-outbound.log
+  levels:
+    root: info # Set default logging level to info.
+    record-parser: debug # The Aerospike record parser class.
+    server: debug # The server class logs.
+    com.aerospike.connect: debug
+
+# Message format produced to Kafka
+format:
+  mode: flat-json
+  metadata-key: metadata
+
+# which Topic the message will route to Kafka
+routing:
+  mode: static
+  destination: xdr-intro
+
+namespaces:
+  trigger:
+    format:
+      mode: flat-json
+      metadata-key: metadata

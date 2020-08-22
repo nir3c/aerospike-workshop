@@ -1,0 +1,39 @@
+---
+version: '3.7'
+services:
+
+  aerospike-enterprise-no-xdr:
+    image: aerospike/aerospike-server-enterprise:4.9.0.8
+    ports:
+      - 3100:<AS_SERVICE_PORT>
+      - 3101:<AS_FABRIC_PORT>
+      - 3102:<AS_HEARTBEAT_PORT>
+      - 3103:<AS_INFO_PORT>
+    volumes:
+      # for windows please place the full path instead of $pwd
+      - $PWD/aerospike:/opt/aerospike/etc
+    container_name: aerospike-enterprise-no-xdr
+    command: ["--config-file", "/opt/aerospike/etc/workshop-aerospike-no-xdr-conf.conf"]
+    networks:
+      - aerospike-workshop-just-as
+
+  aerospike-enterprise-xdr:
+    image: aerospike/aerospike-server-enterprise:4.9.0.8
+    ports:
+      - 3200:3200
+      - 3201:3201
+      - 3202:3202
+      - 3203:3203
+    volumes:
+      # for windows please place the full path instead of $pwd
+      - $PWD/aerospike:/opt/aerospike/etc
+    container_name: aerospike-enterprise-xdr
+    command: ["--config-file", "/opt/aerospike/etc/workshop-aerospike-xdr-conf.conf"]
+    links:
+      - aerospike-enterprise-no-xdr
+    networks:
+      - aerospike-workshop-just-as
+
+networks:
+  aerospike-workshop-just-as:
+    name: aerospike-workshop-just-as

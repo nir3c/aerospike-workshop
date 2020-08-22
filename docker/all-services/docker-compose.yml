@@ -1,0 +1,103 @@
+---
+version: '3.7'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - aerospike-workshop
+
+  broker:
+    image: confluentinc/cp-enterprise-kafka:latest
+    hostname: broker
+    container_name: broker
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'true'
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    networks:
+      - aerospike-workshop
+
+  kafka-manager:
+    container_name: kafka-manager
+    hostname: kafka-manager
+    image: obsidiandynamics/kafdrop
+    ports:
+      - "9000:9000"
+    links:
+      - zookeeper
+      - broker
+    depends_on:
+      - zookeeper
+      - broker
+    environment:
+      KAFKA_BROKERCONNECT: broker:29092
+    networks:
+      - aerospike-workshop
+
+  aerospike-enterprise-xdr:
+      image: aerospike/aerospike-server-enterprise:4.9.0.8
+      ports:
+        - 3200:3200
+        - 3201:3101
+        - 3202:3102
+        - 3203:3103
+      volumes:
+        # for windows please place the full path instead of $pwd
+        - $PWD/aerospike:/opt/aerospike/etc
+      container_name: aerospike-enterprise-xdr
+      links:
+        - aerospike-enterprise-no-xdr
+        - aerospike-kafka-outbound
+      networks:
+        - aerospike-workshop
+      command: ["--config-file", "/opt/aerospike/etc/aerospike-xdr.conf"]
+
+  aerospike-enterprise-no-xdr:
+      image: aerospike/aerospike-server-enterprise:4.9.0.8
+      ports:
+        - 3100:3100
+        - 3101:3101
+        - 3102:3102
+        - 3103:3103
+      volumes:
+        # for windows please place the full path instead of $pwd
+        - $PWD/aerospike:/opt/aerospike/etc
+      container_name: aerospike-enterprise-no-xdr
+      networks:
+        - aerospike-workshop
+      command: ["--config-file", "/opt/aerospike/etc/aerospike-no-xdr.conf"]
+
+  aerospike-kafka-outbound:
+      container_name: aerospike-kafka-outbound
+      image: workshop-aerospike-kafka-outbound:3.0.0
+      volumes:
+        # for windows please place the full path instead of $pwd
+        - $PWD/aerospike-connector:/etc/aerospike-kafka-outbound
+      ports:
+        - 8085:8081
+      networks:
+        - aerospike-workshop
+
+networks:
+  aerospike-workshop:
+    name: aerospike-workshop

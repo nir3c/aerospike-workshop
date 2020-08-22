@@ -1,0 +1,29 @@
+service:
+  port: 8081
+
+producer-props:
+  bootstrap.servers:
+    - broker:29092
+
+logging:
+  file: /var/log/aerospike-kafka-outbound/aerospike-kafka-outbound.log
+  levels:
+    root: info # Set default logging level to info.
+    record-parser: debug # The Aerospike record parser class.
+    server: debug # The server class logs.
+    com.aerospike.connect: debug
+
+format:
+  mode: flat-json
+  metadata-key: metadata
+
+routing:
+  mode: static
+  destination: xdr-intro
+
+
+namespaces:
+  trigger:
+    format:
+      mode: flat-json
+      metadata-key: metadata
