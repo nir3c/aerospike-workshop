@@ -77,10 +77,9 @@ services:
         context: ../kafka-connector
       volumes:
         # for windows please place the full path instead of $pwd
-        - C:\scala-projects\aerospike-workshop\docker\kafka-only\aerospike-connector:/etc/aerospike-kafka-outbound
+        - $PWD/aerospike-connector:/etc/aerospike-kafka-outbound
       ports:
         # - 8085:<CONNECTOR_RUNNING_PORT>
-        - 8085:8081
       links:
         - broker
       networks:
